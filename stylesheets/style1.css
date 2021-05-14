@@ -1,0 +1,77 @@
+* {
+	padding: 0;
+	margin: 0;
+}
+
+
+body {
+	/*background-color: #10316b;*/
+	background-image: linear-gradient(to bottom right, #10316b, #102232, #102221);
+}
+
+
+.items {
+	background-image: linear-gradient(to right, #000000, #001220, #121013);
+	padding: 10px;
+	list-style-type: none;
+	width: auto;
+	display: flex;
+	position: sticky;
+	top: 0;
+	left: 0;
+	justify-content: space-around;
+}
+
+.item {
+	/*background-color: #54f9de;*/
+	padding: 0 20px;
+	border-radius: 10px;
+	/*box-shadow: 0px 7px 0px 0px darken(hotpink, 5%)*/
+    font-size: 20px;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    text-align:center;
+    background-size: 300% 100%;
+    background-image: linear-gradient(to right, #25aae1, #40e495, #30dd8a, #2bb673);
+    transition: all .4s ease-in-out;
+
+}
+
+.item:hover {
+    background-position: 100% 0;
+    transition: all .4s ease-in-out;
+}
+
+.item:focus {
+    outline: none;
+}
+
+
+
+#block {
+	margin: 5% 10%;
+	border: 20px solid #000000;
+	position: relative;
+	min-height: 700px;
+	min-width: 500px;
+	height: 100%;
+	overflow: hidden;
+	background-color: #dcdcd3;
+}
+
+
+.imgs {
+	/*padding: 10px;*/
+	margin: 0;
+	border: 2px solid black;
+}
+
+#outside-check {
+	display: flex;
+	justify-content: space-around;
+}
+
+#check {
+	background-image: linear-gradient(to right, black, gray);
+}
