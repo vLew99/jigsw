@@ -2,7 +2,7 @@
 
 var board;
 const maindiv = document.querySelector("#block");
-var block_selected = false;
+var block_selected = null;
 var level;
 var imgs_path;
 var solution_shown;
@@ -45,6 +45,7 @@ function Board(size, row, column) {
 		tmp_img = document.createElement("img");
 		tmp_img.src = tmp_block.file_location; // getting file location from block
 		tmp_img.width = 200;
+		tmp_img.height = 200;
 		tmp_img.classList = "imgs";
 		tmp_img.style.position = "relative";
 		tmp_img.style.transition = "opacity 0.25s";
@@ -86,83 +87,49 @@ function init(level) {
 	else board = new Board(10, 2, 5);
 
 
-	maindiv.addEventListener("click", (e)=> {
-		if(block_selected == false) {
-
-		} else {
-			let img = e.target;
-			if(img.classList == "imgs") {
-				img.addEventListener()
+	maindiv.addEventListener("mousedown", (e)=> {
+		let img = e.target;
+		if(img.classList == "imgs") {
+			if(block_selected == null) {
+				block_select(img);
+			}
+			else if(block_selected == img) {
+				block_deselect(img);
 			}
 		}
 	});
-
-	// initialise events for board
-	for(let i=0; i<board.array.length; i++) {
-		board.array[i].img.addEventListener("click", e => {
-			for(let j=0; j<board.array.length;j++) {
-				if(board.array[j].current_loc == i){
-					block_click(j, e);
-					break;
-				}
-			}
-		});
-	}
 }
 
 
+maindiv.addEventListener("mousemove", (e) => {
+	if(block_selected != null) {
+		let dim = document.querySelector("#block").getBoundingClientRect();
+		let mouse_x = event.x;
+		let mouse_y = event.y;
+		let box_top = mouse_y - (block_selected.height/2) - dim['top'];
+		let box_left = mouse_x - (block_selected.width/2) - dim['left'];
 
-function block_click(i, e) {
-	if(board.array[i].selected == false){
-		console.log("selected block" , i);
-		block_select(i, e);
+		if(mouse_y > dim['top'] && mouse_y < dim['bottom']) {
+			block_selected.style.top = box_top.toString() + "px";
+		}
+		if( mouse_x > dim['left'] && mouse_x < dim['right']) {
+			block_selected.style.left = box_left.toString() + "px";
+		}
 	}
-	else{
-		console.log("deselect block", i);
-		block_deselect(i);
-	}
+});
+
+
+function block_select(img) {
+	img.style.opacity = 0.7;
+	img.style.zIndex = 9999;
+	img.style.position = "absolute";
+	block_selected = img;
 }
 
-
-function block_select(i, e) {
-	// block_select
-	board.array[i].img.style.opacity = 0.5;
-	board.array[i].selected = true;
-	board.array[i].img.style.zIndex = 9999;
-	board.array[i].img.style.position = "absolute";
-	// board.array[i].img.addEventListener("mousemove", block_move);
-	maindiv.addEventListener("mousemove", block_move);
-}
-
-function block_deselect(i) {
-	board.array[i].selected = false;
-	board.array[i].img.style.opacity = 1;
-	board.array[i].img.style.zIndex = 1;
-	maindiv.removeEventListener("mousemove", block_move);
-}
-
-function block_move(event)
-{
-
-	// console.log(event.target);
-
-	let mouse_x = event.pageX;
-	let mouse_y = event.pageY;
-
-	let box_top = mouse_y - event.target.height*1.25;
-	let box_left = mouse_x - event.target.width*1.5;
-
-	let dim = document.querySelector("#block").getBoundingClientRect();
-
-	// console.log("Width: "  + event.target.width + " Height: " + event.target.height);
-	// console.log("Mouse x: " + event.clientX + " y: " + event.clientY);
-
-	if(mouse_y > dim['top'] && mouse_y < dim['bottom']) {
-		event.target.style.top = box_top.toString() + "px";
-	}
-	if( mouse_x > dim['left'] && mouse_x < dim['right']) {
-		event.target.style.left = box_left.toString() + "px";
-	}
+function block_deselect(img) {
+	img.style.opacity = 1;
+	img.style.zIndex = 1;
+	block_selected = null;
 }
 
 function check_board_correct() {
