@@ -20,7 +20,7 @@ function file_location_string(level) {
 	file_location += Math.round(Math.random()*1).toString() + "_";
 	return file_location;
 }
-
+	
 function Board(size, row, column) {
 	this.array = new Array();
 	this.size = size;
@@ -46,6 +46,7 @@ function Board(size, row, column) {
 		tmp_img.src = tmp_block.file_location; // getting file location from block
 		tmp_img.width = 200;
 		tmp_img.height = 200;
+		tmp_img.draggable = false;
 		tmp_img.classList = "imgs";
 		tmp_img.style.position = "relative";
 		tmp_img.style.transition = "opacity 0.25s";
@@ -73,6 +74,7 @@ function randomize(array) {
 
 
 function init(level) {
+	block_selected = null;
 	if(board!=null) {
 		remove_blocks();
 	}
@@ -86,24 +88,24 @@ function init(level) {
 	else if(level==2) board = new Board(3, 1, 3);
 	else board = new Board(10, 2, 5);
 
-
-	maindiv.addEventListener("mousedown", (e)=> {
-		let img = e.target;
-		if(img.classList == "imgs") {
-			if(block_selected == null) {
-				block_select(img);
-			}
-			else if(block_selected == img) {
-				block_deselect(img);
-			}
-		}
-	});
 }
+
+maindiv.addEventListener("mousedown", (e)=> {
+	let img = e.target;
+	if(img.classList == "imgs") {
+		if(block_selected == null) {
+			block_select(img);
+		}
+		else if(block_selected == img) {
+			block_deselect(img);
+		}
+	}
+});
 
 
 maindiv.addEventListener("mousemove", (e) => {
 	if(block_selected != null) {
-		let dim = document.querySelector("#block").getBoundingClientRect();
+		let dim = maindiv.getBoundingClientRect();
 		let mouse_x = event.x;
 		let mouse_y = event.y;
 		let box_top = mouse_y - (block_selected.height/2) - dim['top'];
@@ -116,6 +118,7 @@ maindiv.addEventListener("mousemove", (e) => {
 			block_selected.style.left = box_left.toString() + "px";
 		}
 	}
+	console.log(1);
 });
 
 
@@ -130,12 +133,12 @@ function block_deselect(img) {
 	img.style.opacity = 1;
 	img.style.zIndex = 1;
 	block_selected = null;
+	update_location();
 }
+
 
 function check_board_correct() {
 	let isCorrect = true;
-	// udate current_loc
-
 	for(let i=0; i<board.array.length; i++) {
 		if(i != board.array[i].correct_loc){
 			isCorrect = false;
@@ -188,6 +191,7 @@ function remove_blocks() {
 	for(let i=0; i<board.array.length; i++) {
 		board.array[i].img.remove();
 	}
+	block_selected = null;
 	board = null;
 }
 
@@ -200,6 +204,10 @@ function start(l) {
 	init(level);
 }
 
+
+function sleep(ms) {
+	return new Promise(r => setTimeout(r, ms));
+}
 
 
 
@@ -225,6 +233,14 @@ document.querySelector("#check").addEventListener("click", e => {
 			remove_blocks();
 			add_solution();
 			solution_shown = true;
+		}
+		else {
+			if(maindiv.classList == "") {
+				maindiv.classList = "wrong";
+				sleep(500).then(()=> {
+					maindiv.classList = "";
+				});
+			}
 		}
 	}
 })
