@@ -73,6 +73,8 @@ html {
 	/*padding: 10px;*/
 	margin: 0;
 	border: 2px solid black;
+	position: relative;
+	transition: opacity 0.25s;
 }
 
 #outside-check {
@@ -82,4 +84,16 @@ html {
 
 #check {
 	background-image: linear-gradient(to right, black, gray);
+}
+
+.solution {
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+}
+
+
+#img_deselected {
+	opacity: 1;
+	z-index: 1;
 }
