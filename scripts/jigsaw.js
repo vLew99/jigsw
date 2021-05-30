@@ -1,15 +1,29 @@
 // CONSTANTS
 
+const STARTPATH = "imgs/level"
 const maindiv = document.querySelector("#block");
 var level;
 let imgs_path;
 var solution;
 var solution_shown = "not_shown";
-const STARTPATH = "imgs/level"
+var board;
 
 
+const deepClone = (o) => {
+    if(o == null || typeof(o) != 'object')
+        return o;
 
+    if(o.constructor.name == "HTMLImageElement"){
+    	console.log(o.constructor.name);
+    	return o;
+    }
 
+    var temp = new o.constructor();
+    for(var key in o){
+        temp[key] = deepClone(o[key])
+    }
+    return temp;
+};
 
 
 function Block(file_location, correct_loc, current_loc, img) {
@@ -94,30 +108,6 @@ const createImgElement = (parent, file_location, class_list, img_size, is_draggb
 	return img;
 };
 
-var board;
-
-function init(level) {
-
-
-	if(board!=null) {
-		board = removeBoard(board);
-	}
-
-	if(solution_shown == "shown") {
-		solution = removeSolution(solution);
-		solution_shown = "not_shown";
-	}
-
-	if(level==1) board = new Board(2);
-	else if(level==2) board = new Board(3);
-	else board = new Board(10);
-
-	console.log(board);
-	console.log(this.board);
-
-	initializeEvents(board, blockSelect, blockDeselect, updateBlockLocations, blockSort, start, sleep);
-}
-
 
 
 // some additional checking needs to be done here
@@ -167,18 +157,14 @@ const removeSolution = (solution) => {
 	solution.remove();
 }
 
-const removeBoard = (b) => {
-	b.array.map( item => item.img.remove() );
-	return null;
+const removeBoard = (b, clone) => {
+	console.log(1);
+	let b1 = clone(b);
+	console.log(2);
+	b1.array = b1.array.map( item => item.img.remove() );
+	b1 = null;
+	return b1;
 };
-
-
-
-
-function start(l) {
-	level = l;
-	init(level);
-}
 
 
 const sleep = (ms) => {
@@ -270,22 +256,21 @@ const blinkWrongAnswer = (div, sleep) => {
 };
 
 
-const checkSolution = (event, b, updateBlockLocations, blockSort, checkBoardCorrect, sleep) => {
+const checkSolution = (event, b, updateBlockLocations, blockSort, checkBoardCorrect, sleep, deepClone) => {
 	if(b!= null) {
 		b = updateBlockLocations(b, blockSort);
 
 		if(solution_shown == "not_shown") {
-			if(checkBoardCorrect(b)) {
-				// correct answer
+			console.log(checkBoardCorrect(b));
+			if(checkBoardCorrect(b)) { // correct answer
 				console.log("this is b before", b);
-				b = removeBoard(b);
+				console.log(deepClone);
+				b = removeBoard(b, deepClone);
 				console.log("this is b " , b);
 				solution = addSolution(maindiv, imgs_path + "image.jpg", "solution");
 				solution_shown = "shown";
 			}
-			else {
-
-				// wrong answer
+			else { // wrong answer
 				blinkWrongAnswer(maindiv, sleep);
 			}
 		}
@@ -293,26 +278,39 @@ const checkSolution = (event, b, updateBlockLocations, blockSort, checkBoardCorr
 };
 
 
-const initializeEvents = (b, blockSelect, blockDeselect, updateBlockLocations, blockSort, start, sleep) => {
+const initializeEvents = (b, blockSelect, blockDeselect, updateBlockLocations, blockSort, start, sleep, deepClone) => {
 	document.querySelector("#block").addEventListener("click", event => maindivMouseClick(
 		event, b, blockSelect, blockDeselect, updateBlockLocations, blockSort ));
 	document.querySelector("#block").addEventListener("mousemove", event => maindivMouseMove(event, b));
-	document.querySelector("#level1").addEventListener("click", event => start(1));
+	document.querySelector("#level1").addEventListener("click", event => start(1)); 
 	document.querySelector("#level2").addEventListener("click", event => start(2));
 	document.querySelector("#level3").addEventListener("click", event => start(3));
 	document.querySelector("#check").addEventListener("click", event => checkSolution(
-		event, b, updateBlockLocations, blockSort, checkBoardCorrect, sleep ));
+		event, b, updateBlockLocations, blockSort, checkBoardCorrect, sleep , deepClone));
 };
 
+function init(level) {
+	if(board!=null) {
+		board = removeBoard(board, deepClone);
+	}
 
-const removeEvents = () => {
-	let b = document.body;
-	let b_new = b.cloneNode(true);
-	document.body = b_new;
-};
+	if(solution_shown == "shown") {
+		solution = removeSolution(solution);
+		solution_shown = "not_shown";
+	}
 
-// events
+	if(level==1) board = new Board(2);
+	else if(level==2) board = new Board(3);
+	else board = new Board(10);
 
+	initializeEvents(board, blockSelect, blockDeselect, updateBlockLocations, blockSort, start, sleep, deepClone);
+}
+
+
+function start(l) {
+	level = l;
+	init(level);
+}
 
 
 // //////////////////////////////////// RUNNNNN
