@@ -9,21 +9,6 @@ var solution_shown = "not_shown";
 var board;
 
 
-const deepClone = (o) => {
-    if(o == null || typeof(o) != 'object')
-        return o;
-
-    if(o.constructor.name == "HTMLImageElement"){
-    	console.log(o.constructor.name);
-    	return o;
-    }
-
-    var temp = new o.constructor();
-    for(var key in o){
-        temp[key] = deepClone(o[key])
-    }
-    return temp;
-};
 
 
 function Block(file_location, correct_loc, current_loc, img) {
@@ -31,8 +16,25 @@ function Block(file_location, correct_loc, current_loc, img) {
 	this.file_location = file_location;
 	this.current_loc = current_loc;
 	this.correct_loc= correct_loc;
-	this.selected = false;
 }
+
+const deepClone = function dc(o) {
+    if(o == null || typeof(o) != 'object'){
+        return o;
+    }
+
+    if(o.constructor.name == "HTMLImageElement"){
+    	return o;
+    }
+
+	var temp = {...o};
+    for(var key in o){
+        temp[key] = dc(o[key])
+    }
+
+    return temp;
+};
+
 
 function Board(size) {
 	this.size = size;
@@ -54,8 +56,22 @@ function Board(size) {
 		);
 	});
 	this.block_selected = null;
-	this.parent = document.querySelector("#block");
 }
+
+
+
+/**
+ * Creates a array of strings containing the full path of each images in the current level.
+ * @param  {string} folder_location the folder location of images for the current level.
+ * @param  {integer} array_size      the number of images that are in the folder.
+ * @return {array}                 an array of strings containing the full path of each images in the level.
+ */
+const getFileLocationsArray = (folder_location, array_size) => {
+	let fla = new Array(array_size);
+	fla = fla.fill("");
+	fla = fla.map( (item, index) => item += folder_location + index.toString() + ".png");
+	return fla;
+};
 
 
 
@@ -72,20 +88,6 @@ const getFileLocationStartPath = (level_id, num_of_choices, seperator) => {
 	return flsp;
 };
 
-
-
-/**
- * Creates a array of strings containing the full path of each images in the current level.
- * @param  {string} folder_location the folder location of images for the current level.
- * @param  {integer} array_size      the number of images that are in the folder.
- * @return {array}                 an array of strings containing the full path of each images in the level.
- */
-const getFileLocationsArray = (folder_location, array_size) => {
-	let fla = new Array(array_size);
-	fla = fla.fill("");
-	fla = fla.map( (item, index) => item += folder_location + index.toString() + ".png");
-	return fla;
-};
 
 
 
@@ -124,6 +126,7 @@ const checkBoardCorrect = (b) => {
  * @return {Boolean}       Returns which is farther from (0, 0) on DOM.
  */
 const blockSort = (block1, block2) => {
+	console.log(block1, block2);
 	let block1_rect = block1.img.getBoundingClientRect();
 	let block2_rect = block2.img.getBoundingClientRect();
 	if(Math.abs(block1_rect['top'] - block2_rect['top']) < 200 ) /////////////////////////////
@@ -153,17 +156,13 @@ const addSolution = (parent, file_location, class_list) => {
 };
 
 
-const removeSolution = (solution) => {
-	solution.remove();
-}
-
 const removeBoard = (b, clone) => {
-	console.log(1);
-	let b1 = clone(b);
-	console.log(2);
-	b1.array = b1.array.map( item => item.img.remove() );
-	b1 = null;
-	return b1;
+	// let b1 = deepClone(b);
+	// b1.array = Object.values(b1.array);
+	// console.log(b1.array);
+	b.array.foreach( (item) => item.img.remove());
+	// console.log(b1.array)
+	b = null;
 };
 
 
@@ -207,8 +206,10 @@ const blockDeselect = (img_to_deselect) => {
  * @return {Object Board}           Returns the updated board
  */
 const updateBlockLocations = (b, blockSort) => {
+	// let b1 = deepClone(b);
+	// b1.array = Object.values(b1.array);
 	b.array.sort(blockSort);
-	return b;
+	// return b1;
 }
 
 
@@ -222,7 +223,7 @@ const maindivMouseClick = (event, b, blockSelect, blockDeselect, updateBlockLoca
 		}
 		else if(b.block_selected == img) {
 			b.block_selected = blockDeselect(img);
-			b = updateBlockLocations(b, blockSort);
+			updateBlockLocations(b, blockSort);
 		}
 	}
 };
@@ -230,7 +231,7 @@ const maindivMouseClick = (event, b, blockSelect, blockDeselect, updateBlockLoca
 
 const maindivMouseMove = (event, b) => {
 	if(b.block_selected != null) {
-		let dim = b.parent.getBoundingClientRect();
+		let dim = maindiv.getBoundingClientRect();
 		let mouse_x = event.x;
 		let mouse_y = event.y;
 		let box_top = mouse_y - (b.block_selected.height/2) - dim['top'];
@@ -258,15 +259,14 @@ const blinkWrongAnswer = (div, sleep) => {
 
 const checkSolution = (event, b, updateBlockLocations, blockSort, checkBoardCorrect, sleep, deepClone) => {
 	if(b!= null) {
-		b = updateBlockLocations(b, blockSort);
+		updateBlockLocations(b, blockSort);
 
 		if(solution_shown == "not_shown") {
 			console.log(checkBoardCorrect(b));
 			if(checkBoardCorrect(b)) { // correct answer
-				console.log("this is b before", b);
-				console.log(deepClone);
-				b = removeBoard(b, deepClone);
-				console.log("this is b " , b);
+				// console.log("this is b before", b);
+				removeBoard(b, deepClone);
+				// console.log("this is b " , b);
 				solution = addSolution(maindiv, imgs_path + "image.jpg", "solution");
 				solution_shown = "shown";
 			}
@@ -291,13 +291,19 @@ const initializeEvents = (b, blockSelect, blockDeselect, updateBlockLocations, b
 
 function init(level) {
 	if(board!=null) {
-		board = removeBoard(board, deepClone);
+		console.log("BOARD: ", board);
+		removeBoard(board, deepClone);
+		console.log("BOARD: ", board);
 	}
 
 	if(solution_shown == "shown") {
-		solution = removeSolution(solution);
+		console.log("SOLUTION: ", solution);
+		solution.remove();
+		console.log("SOLUTION: ", solution);
+		solution = null;
 		solution_shown = "not_shown";
 	}
+
 
 	if(level==1) board = new Board(2);
 	else if(level==2) board = new Board(3);
