@@ -1,7 +1,7 @@
 // CONSTANTS
 
 const STARTPATH = "imgs/level"
-const maindiv = document.querySelector("#block");
+var maindiv = document.querySelector("#block");
 var level;
 let imgs_path;
 var solution;
@@ -114,7 +114,7 @@ const createImgElement = (parent, file_location, class_list, img_size, is_draggb
 
 // some additional checking needs to be done here
 const checkBoardCorrect = (b) => {
-	return b.array.every((item, index) => index == item.correct_loc);
+	return board.array.every((item, index) => index == item.correct_loc);
 };
 
 
@@ -156,13 +156,9 @@ const addSolution = (parent, file_location, class_list) => {
 };
 
 
-const removeBoard = (b, clone) => {
-	// let b1 = deepClone(b);
-	// b1.array = Object.values(b1.array);
-	// console.log(b1.array);
-	b.array.foreach( (item) => item.img.remove());
-	// console.log(b1.array)
-	b = null;
+const removeBoard = () => {
+	board.array.forEach( (item) => item.img.remove());
+	board = null;
 };
 
 
@@ -205,11 +201,8 @@ const blockDeselect = (img_to_deselect) => {
  * @param  {Function} blockSort Helper Function for sorting
  * @return {Object Board}           Returns the updated board
  */
-const updateBlockLocations = (b, blockSort) => {
-	// let b1 = deepClone(b);
-	// b1.array = Object.values(b1.array);
-	b.array.sort(blockSort);
-	// return b1;
+const updateBlockLocations = (blockSort) => {
+	board.array.sort(blockSort);
 }
 
 
@@ -223,7 +216,7 @@ const maindivMouseClick = (event, b, blockSelect, blockDeselect, updateBlockLoca
 		}
 		else if(b.block_selected == img) {
 			b.block_selected = blockDeselect(img);
-			updateBlockLocations(b, blockSort);
+			updateBlockLocations(blockSort);
 		}
 	}
 };
@@ -259,13 +252,13 @@ const blinkWrongAnswer = (div, sleep) => {
 
 const checkSolution = (event, b, updateBlockLocations, blockSort, checkBoardCorrect, sleep, deepClone) => {
 	if(b!= null) {
-		updateBlockLocations(b, blockSort);
+		updateBlockLocations(blockSort);
 
 		if(solution_shown == "not_shown") {
 			console.log(checkBoardCorrect(b));
 			if(checkBoardCorrect(b)) { // correct answer
 				// console.log("this is b before", b);
-				removeBoard(b, deepClone);
+				removeBoard();
 				// console.log("this is b " , b);
 				solution = addSolution(maindiv, imgs_path + "image.jpg", "solution");
 				solution_shown = "shown";
@@ -291,9 +284,7 @@ const initializeEvents = (b, blockSelect, blockDeselect, updateBlockLocations, b
 
 function init(level) {
 	if(board!=null) {
-		console.log("BOARD: ", board);
-		removeBoard(board, deepClone);
-		console.log("BOARD: ", board);
+		removeBoard();
 	}
 
 	if(solution_shown == "shown") {
@@ -304,18 +295,16 @@ function init(level) {
 		solution_shown = "not_shown";
 	}
 
-
 	if(level==1) board = new Board(2);
 	else if(level==2) board = new Board(3);
 	else board = new Board(10);
-
-	initializeEvents(board, blockSelect, blockDeselect, updateBlockLocations, blockSort, start, sleep, deepClone);
 }
 
 
 function start(l) {
 	level = l;
 	init(level);
+	initializeEvents(board, blockSelect, blockDeselect, updateBlockLocations, blockSort, start, sleep, deepClone);
 }
 
 
