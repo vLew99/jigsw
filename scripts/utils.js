@@ -7,7 +7,7 @@
 export const getFileLocationsArray = (folder_location, array_size) => {
     let fla = new Array(array_size);
     fla = fla.fill("");
-    fla = fla.map( (item, index) => item += folder_location + index.toString() + ".png");
+    fla = fla.map( (item, index) => item += folder_location + index.toString() + ".jpg");
     return fla;
 };
 
