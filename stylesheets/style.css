@@ -5,7 +5,8 @@
 
 html {
 	height: 100%;
-	background-image: linear-gradient(to bottom, #10316b, #102232, #102221);
+	/*background-image: linear-gradient(to bottom, #10316b, #102232, #102221);*/
+	background-color: #10416b;
 }
 
 .wrong {
@@ -21,12 +22,13 @@ html {
 
 
 .items {
-	/*background-image: linear-gradient(to right, #000000, #001220, #121013);*/
+	background-image: linear-gradient(to right, #000000, #001220, #121013);
 	padding: 10px;
 	list-style-type: none;
 	width: auto;
 	display: flex;
 	position: sticky;
+	z-index: 100;
 	top: 0;
 	left: 0;
 	justify-content: space-around;
@@ -72,9 +74,9 @@ html {
 .imgs {
 	/*padding: 10px;*/
 	margin: 0;
-	border: 2px solid black;
+	border: 1px solid black;
 	position: relative;
-	transition: opacity 0.25s;
+	transition: opacity 0.5s;
 }
 
 #outside-check {
@@ -92,8 +94,6 @@ html {
 	transform: translateY(-50%);
 }
 
-
-#img_deselected {
-	opacity: 1;
-	z-index: 1;
+hr {
+	color: #10416b;
 }
