@@ -1,0 +1,13 @@
+{
+    "version": 2,
+    "name": "jigsw-vercel",
+    "builds": [
+        {
+            "src": "./index.js",
+            "use": "@now/node",
+            "config": {
+                "maxLambdaSize": "50mb"
+            }
+        }
+    ]
+}
