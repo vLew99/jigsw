@@ -1,5 +1,6 @@
 {
     "version": 2,
     "name": "jigsw-vercel",
+    "builds": [],
     "outputDirectory": "src/"
 }
