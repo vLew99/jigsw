@@ -1,10 +1,5 @@
 {
     "version": 2,
     "name": "jigsw-vercel",
-    "builds": [
-    {
-        "src": "./index.js",
-        "use": "@vercel/node"
-    }
-  ]
+    "outputDirectory": "src/"
 }
